@@ -1,0 +1,52 @@
+version: '3.1'
+
+networks:
+ cassandra_network:
+
+volumes:
+  cassandra-data-node1:
+  cassandra-data-node2:
+  cassandra-data-node3:
+
+services:
+  cassandra-node1:
+    image: bitnami/cassandra:latest
+    restart: always
+    networks:
+      - cassandra_network
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+      - CASSANDRA_PASSWORD_SEEDER=yes
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+    ports:
+      - "9042:9042"
+    volumes:
+       - cassandra-data-node1:/bitnami
+
+  cassandra-node2:
+    image: bitnami/cassandra:latest
+    restart: always
+    networks:
+      - cassandra_network
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+    volumes:
+       - cassandra-data-node2:/bitnami
+
+  cassandra-node3:
+    image: bitnami/cassandra:latest
+    restart: always
+    networks:
+      - cassandra_network
+    environment:
+      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
+      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
+      - CASSANDRA_USER=cassandra
+      - CASSANDRA_PASSWORD=cassandra
+    volumes:
+       - cassandra-data-node3:/bitnami
