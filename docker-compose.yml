@@ -1,7 +1,8 @@
 version: '3.1'
 
 networks:
- cassandra_network:
+  cassandra-network:
+    driver: bridge
 
 volumes:
   cassandra-data-node1:
@@ -13,7 +14,7 @@ services:
     image: bitnami/cassandra:latest
     restart: always
     networks:
-      - cassandra_network
+      - cassandra-network
     environment:
       CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
       CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
@@ -23,30 +24,34 @@ services:
     ports:
       - "9042:9042"
     volumes:
-       - cassandra-data-node1:/bitnami
+      - cassandra-data-node1:/bitnami
 
   cassandra-node2:
     image: bitnami/cassandra:latest
     restart: always
     networks:
-      - cassandra_network
+      - cassandra-network
     environment:
       CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
       CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
       CASSANDRA_USER: "cassandra"
       CASSANDRA_PASSWORD: "cassandra"
     volumes:
-       - cassandra-data-node2:/bitnami
+      - cassandra-data-node2:/bitnami
+    depends_on:
+      - cassandra-node1
 
   cassandra-node3:
     image: bitnami/cassandra:latest
     restart: always
     networks:
-      - cassandra_network
+      - cassandra-network
     environment:
       CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
       CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
       CASSANDRA_USER: "cassandra"
       CASSANDRA_PASSWORD: "cassandra"
     volumes:
-       - cassandra-data-node3:/bitnami
+      - cassandra-data-node3:/bitnami
+    depends_on:
+      - cassandra-node1
