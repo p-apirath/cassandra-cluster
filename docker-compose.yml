@@ -15,11 +15,11 @@ services:
     networks:
       - cassandra_network
     environment:
-      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
-      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
-      - CASSANDRA_PASSWORD_SEEDER=yes
-      - CASSANDRA_USER=cassandra
-      - CASSANDRA_PASSWORD=cassandra
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_PASSWORD_SEEDER: "yes"
+      CASSANDRA_USER: "kong"
+      CASSANDRA_PASSWORD: "kong"
     ports:
       - "9042:9042"
     volumes:
@@ -31,10 +31,10 @@ services:
     networks:
       - cassandra_network
     environment:
-      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
-      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
-      - CASSANDRA_USER=cassandra
-      - CASSANDRA_PASSWORD=cassandra
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_USER: "kong"
+      CASSANDRA_PASSWORD: "kong"
     volumes:
        - cassandra-data-node2:/bitnami
 
@@ -44,9 +44,9 @@ services:
     networks:
       - cassandra_network
     environment:
-      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
-      - CASSANDRA_SEEDS=cassandra-node1,cassandra-node2,cassandra-node3
-      - CASSANDRA_USER=cassandra
-      - CASSANDRA_PASSWORD=cassandra
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_USER: "kong"
+      CASSANDRA_PASSWORD: "kong"
     volumes:
        - cassandra-data-node3:/bitnami
