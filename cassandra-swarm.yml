@@ -1,0 +1,97 @@
+version: '3.1'
+
+networks:
+  cassandra-network:
+#    driver: bridge
+#    driver: overlay
+
+volumes:
+  cassandra-data-node1:
+    driver: local
+  cassandra-data-node2:
+    driver: local
+  cassandra-data-node3:
+    driver: local
+
+services:
+  cassandra-node1:
+    image: bitnami/cassandra:latest
+    labels:
+      kompose.service.type: nodeport
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+        - node.labels.db==azpspwkongappgwf002
+    networks:
+      - cassandra-network
+    environment:
+      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node1"
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_PASSWORD_SEEDER: "yes"
+      CASSANDRA_USER: "kong"
+      CASSANDRA_PASSWORD: "kong"
+    ports:
+#      - "7000:7000"
+#      - "7001:7001"
+      - "9042:9042"
+#      - "9160:9160"
+    volumes:
+      - cassandra-data-node1:/bitnami
+
+  cassandra-node2:
+    image: bitnami/cassandra:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+        - node.labels.db==azpspwkongappgwf003
+    networks:
+      - cassandra-network
+    environment:
+      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node2"
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_USER: "kong"
+      CASSANDRA_PASSWORD: "kong"
+    volumes:
+      - cassandra-data-node2:/bitnami
+    links:
+      - cassandra-node1
+    depends_on:
+      - cassandra-node1
+
+  cassandra-node3:
+    image: bitnami/cassandra:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 120s
+      placement:
+        constraints:
+        - node.labels.db==azpspwkongappgwf003
+    networks:
+      - cassandra-network
+    environment:
+      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node3"
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_USER: "kong"
+      CASSANDRA_PASSWORD: "kong"
+    volumes:
+      - cassandra-data-node3:/bitnami
+    links:
+      - cassandra-node1
+    depends_on:
+      - cassandra-node1
