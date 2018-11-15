@@ -6,8 +6,11 @@ networks:
 
 volumes:
   cassandra-data-node1:
+    driver: local
   cassandra-data-node2:
+    driver: local
   cassandra-data-node3:
+    driver: local
 
 services:
   cassandra-node1:
@@ -16,13 +19,22 @@ services:
     networks:
       - cassandra-network
     environment:
-      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
       CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_DATACENTER: "DataCenter1"
+      CASSANDRA_RACK: "Rack-KongDB"
       CASSANDRA_PASSWORD_SEEDER: "yes"
       CASSANDRA_USER: "cassandra"
       CASSANDRA_PASSWORD: "cassandra"
+      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node1"
     ports:
+#      - "7000:7000"
+#      - "7001:7001"
+#      - "7199:7199"
       - "9042:9042"
+#      - "9160:9160"
     volumes:
       - cassandra-data-node1:/bitnami
 
@@ -32,12 +44,19 @@ services:
     networks:
       - cassandra-network
     environment:
-      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
       CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_DATACENTER: "DataCenter1"
+      CASSANDRA_RACK: "Rack-KongDB"
       CASSANDRA_USER: "cassandra"
       CASSANDRA_PASSWORD: "cassandra"
+      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node2"
     volumes:
       - cassandra-data-node2:/bitnami
+    links:
+      - cassandra-node1
     depends_on:
       - cassandra-node1
 
@@ -47,11 +66,18 @@ services:
     networks:
       - cassandra-network
     environment:
-      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
       CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_DATACENTER: "DataCenter1"
+      CASSANDRA_RACK: "Rack-KongDB"
       CASSANDRA_USER: "cassandra"
       CASSANDRA_PASSWORD: "cassandra"
+      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node3"
     volumes:
       - cassandra-data-node3:/bitnami
+    links:
+      - cassandra-node1
     depends_on:
       - cassandra-node1
