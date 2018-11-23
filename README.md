@@ -2,7 +2,17 @@
 
 **connect cassandra cluster**     
 ```
-docker run -it --rm bitnami/cassandra:latest cqlsh --username <user> --password <passwd> <host> <port>
+$ docker run -it --rm bitnami/cassandra:latest cqlsh --username <user> --password <passwd> <host> <port>
+
+$ docker exec -it kong-api-appgw-cluster_cassandra-node2_1_ed12ea994e09 nodetool status
+Datacenter: datacenter1
+=======================
+Status=Up/Down
+|/ State=Normal/Leaving/Joining/Moving
+--  Address     Load       Tokens       Owns (effective)  Host ID                               Rack
+DN  172.18.0.2  100.65 KiB  256          64.0%             486748fd-cd06-4b7e-931e-a7508ee08bf8  rack1
+UN  172.18.0.3  69.93 KiB  256          70.1%             b99bbf70-41fd-497c-b34e-3ffc928899da  rack1
+UN  172.18.0.4  111.43 KiB  256          65.8%             4659cfeb-b65b-4f5d-9a0b-a8b9dee76f4b  rack1
 ```
 **output**    
 ```
