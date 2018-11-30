@@ -2,7 +2,7 @@
 
 **connect cassandra cluster**     
 ```
-$ docker run -it --rm bitnami/cassandra:latest cqlsh --username <user> --password <passwd> <host> <port>
+$ docker run -it --rm bitnami/cassandra:latest cqlsh --username <user> --password <passwd> <host-ip> <port>
 
 $ docker exec -it kong-api-appgw-cluster_cassandra-node2_1_ed12ea994e09 nodetool status
 Datacenter: datacenter1
