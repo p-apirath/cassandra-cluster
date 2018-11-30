@@ -5,14 +5,40 @@ networks:
     driver: bridge
 
 volumes:
+  cassandra-data-node0:
+    driver: local
   cassandra-data-node1:
     driver: local
   cassandra-data-node2:
     driver: local
-  cassandra-data-node3:
-    driver: local
 
 services:
+### cassandra cluster
+  cassandra-node0:
+    image: bitnami/cassandra:latest
+    restart: always
+    networks:
+      - cassandra-network
+    environment:
+      MAX_HEAP_SIZE: "512M"
+      HEAP_NEWSIZE: "128M"
+      CASSANDRA_SEEDS: "cassandra-node0,cassandra-node1,cassandra-node2"
+      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
+      CASSANDRA_DATACENTER: "DataCenter1"
+      CASSANDRA_RACK: "Rack-KongDB"
+      CASSANDRA_PASSWORD_SEEDER: "yes"
+      CASSANDRA_USER: "cassandra"
+      CASSANDRA_PASSWORD: "cassandra"
+      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node0"
+    # ports:
+    #   - "7000:7000"
+    #   - "7001:7001"
+    #   - "7199:7199"
+    #   - "9042:9042"
+    #   - "9160:9160"
+    volumes:
+      - cassandra-data-node0:/bitnami
+
   cassandra-node1:
     image: bitnami/cassandra:latest
     restart: always
@@ -21,22 +47,19 @@ services:
     environment:
       MAX_HEAP_SIZE: "512M"
       HEAP_NEWSIZE: "128M"
-      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_SEEDS: "cassandra-node0,cassandra-node1,cassandra-node2"
       CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
       CASSANDRA_DATACENTER: "DataCenter1"
       CASSANDRA_RACK: "Rack-KongDB"
-      CASSANDRA_PASSWORD_SEEDER: "yes"
       CASSANDRA_USER: "cassandra"
       CASSANDRA_PASSWORD: "cassandra"
       CASSANDRA_BROADCAST_ADDRESS: "cassandra-node1"
-    ports:
-#      - "7000:7000"
-#      - "7001:7001"
-#      - "7199:7199"
-      - "9042:9042"
-#      - "9160:9160"
     volumes:
       - cassandra-data-node1:/bitnami
+    links:
+      - cassandra-node0
+    depends_on:
+      - cassandra-node0
 
   cassandra-node2:
     image: bitnami/cassandra:latest
@@ -46,7 +69,7 @@ services:
     environment:
       MAX_HEAP_SIZE: "512M"
       HEAP_NEWSIZE: "128M"
-      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
+      CASSANDRA_SEEDS: "cassandra-node0,cassandra-node1,cassandra-node2"
       CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
       CASSANDRA_DATACENTER: "DataCenter1"
       CASSANDRA_RACK: "Rack-KongDB"
@@ -56,28 +79,30 @@ services:
     volumes:
       - cassandra-data-node2:/bitnami
     links:
-      - cassandra-node1
+      - cassandra-node0
     depends_on:
-      - cassandra-node1
+      - cassandra-node0
 
-  cassandra-node3:
-    image: bitnami/cassandra:latest
+### haproxy is load balancer for cassandra cluster
+  haproxy:
+    image: haproxy:latest
     restart: always
+    # command: "apt-get update && apt-get install -y wget vim telnet curl net-tools iputils-ping"
     networks:
       - cassandra-network
-    environment:
-      MAX_HEAP_SIZE: "512M"
-      HEAP_NEWSIZE: "128M"
-      CASSANDRA_SEEDS: "cassandra-node1,cassandra-node2,cassandra-node3"
-      CASSANDRA_CLUSTER_NAME: "cassandra-cluster"
-      CASSANDRA_DATACENTER: "DataCenter1"
-      CASSANDRA_RACK: "Rack-KongDB"
-      CASSANDRA_USER: "cassandra"
-      CASSANDRA_PASSWORD: "cassandra"
-      CASSANDRA_BROADCAST_ADDRESS: "cassandra-node3"
     volumes:
-      - cassandra-data-node3:/bitnami
+      - "./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro"
+    ports:
+      - "7000:7000"
+      - "7001:7001"
+      - "7199:7199"
+      - "9042:9042"
+      - "9160:9160"
     links:
+      - cassandra-node0
       - cassandra-node1
+      - cassandra-node2
     depends_on:
+      - cassandra-node0
       - cassandra-node1
+      - cassandra-node2
